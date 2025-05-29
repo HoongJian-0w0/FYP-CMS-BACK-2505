@@ -5,8 +5,6 @@ import ${superServiceClassPackage};
 
 /**
  * $!{table.comment} Service Class
- * @author ${author}
- * @since ${date}
  */
 #if(${kotlin})
 interface ${table.serviceName} : ${superServiceClass}<${entity}>

@@ -8,8 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * $!{table.comment} Mapper
- * @author ${author}
- * @since ${date}
  */
 #if(${mapperAnnotation})
 @Mapper

@@ -2,9 +2,10 @@ package ${package.Controller};
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pms.common.constants.ResultConstants;
-import com.cms.common.result.Result;
-import com.pms.exception.ServiceException;
+import io.github.hoongjian_0w0.cmsback.common.result.Result;
+import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
+
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,8 +26,6 @@ import ${superControllerClassPackage};
 
 /**
  * $!{table.comment} Controller
- * @author ${author}
- * @since ${date}
  */
 #if(${restControllerStyle})
 @RestController
@@ -35,105 +34,68 @@ import ${superControllerClassPackage};
 #end
 @RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
 #if(${kotlin})
-class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
-
+        class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
 #else
-#if(${superControllerClass})
+    #if(${superControllerClass})
 public class ${table.controllerName} extends ${superControllerClass} {
-#else
+    #else
 public class ${table.controllerName} {
-#end
+    #end
 
     @Resource
     private ${table.serviceName} ${table.entityPath}Service;
 
-    /**
-     * Get All ${entity}
-     * @return Result
-     */
     @GetMapping
     public Result getAll${entity}() {
-        return Result.success(${table.entityPath}Service.list());
+        return Result.ok().data("list", ${table.entityPath}Service.list()).message("Fetched All ${entity}");
     }
 
-    /**
-     * Get ${entity} By Id
-     * @param id
-     * @return Result
-     */
     @GetMapping("/{id}")
-    public Result getUserById(@PathVariable Integer id) {
-        return Result.success(${table.entityPath}Service.getById(id));
+    public Result getById(@PathVariable Integer id) {
+        return Result.ok().data("item", ${table.entityPath}Service.getById(id)).message("Fetched ${entity} by ID");
     }
 
-    /**
-     * Save Or Update ${entity}
-     * @param ${table.entityPath}
-     * @return Result
-     */
     @PostMapping
     public Result save(@RequestBody ${entity} ${table.entityPath}) {
         try {
-            ${table.entityPath}Service.save(${table.entityPath});
-            return Result.success(null, "${table.entityPath} Saved Successfully");
+                ${table.entityPath}Service.save(${table.entityPath});
+            return Result.ok().message("${entity} Saved Successfully");
         } catch (Exception e) {
-            throw new ServiceException(ResultConstants.INTERNAL_SERVER_ERROR, "Server Error, Failed to Save ${table.entityPath}. Please Try Again.");
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Save ${entity}");
         }
     }
 
-    /**
-     * Update ${entity}
-     * @param ${table.entityPath}
-     * @return Result
-     */
     @PutMapping
     public Result update(@RequestBody ${entity} ${table.entityPath}) {
         if (${table.entityPath}Service.updateById(${table.entityPath})) {
-            return Result.success(null, "${entity} Updated Successfully");
+            return Result.ok().message("${entity} Updated Successfully");
         }
-        throw new ServiceException(ResultConstants.NOT_FOUND, "Update Fail, ${entity} Not Found. Please Try Again.");
+        throw new ServiceException(ResultCode.NOT_FOUND, "Update Failed: ${entity} Not Found");
     }
 
-    /**
-     * Delete Specific ${entity}
-     * @param id
-     * @return Result
-     */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Integer id) {
         if (${table.entityPath}Service.removeById(id)) {
-            return Result.success(ResultConstants.OK,"${entity} Removed Successfully");
+            return Result.ok().message("${entity} Deleted Successfully");
         }
-        return Result.error(ResultConstants.INTERNAL_SERVER_ERROR,"Server Error, Failed to Delete ${entity}. Please Try Again.");
+        return Result.error().message("Failed to Delete ${entity}");
     }
 
-    /**
-     * Batch Delete ${entity}
-     * @param ids
-     * @return Result
-     */
     @DeleteMapping("/del/batch/{ids}")
-    public Result delete(@PathVariable List<Integer> ids) {
+    public Result deleteBatch(@PathVariable List<Integer> ids) {
         if (${table.entityPath}Service.removeByIds(ids)) {
-            return Result.success(ResultConstants.OK,"${entity}s Removed Successfully");
+            return Result.ok().message("${entity}s Deleted Successfully");
         }
-        return Result.error(ResultConstants.INTERNAL_SERVER_ERROR,"Server Error, Failed to Remove  ${entity}s. Please Try Again.");
+        return Result.error().message("Failed to Batch Delete ${entity}s");
     }
 
-    /**
-     * Page Query
-     * @param pageNum
-     * @param pageSize
-     * @return Result
-     */
     @GetMapping("/page")
     public Result getPage(@RequestParam Integer pageNum,
                           @RequestParam Integer pageSize) {
         QueryWrapper<${entity}> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
-        return Result.success(${table.entityPath}Service.page(new Page<>(pageNum,pageSize), queryWrapper));
+        Page<${entity}> page = ${table.entityPath}Service.page(new Page<>(pageNum, pageSize), queryWrapper);
+        return Result.ok().data("page", page).message("Paged ${entity} List");
     }
-
 }
-
 #end

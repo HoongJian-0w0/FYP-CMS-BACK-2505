@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * $!{table.comment} Service Implementation Class
- * @author ${author}
- * @since ${date}
  */
 @Service
 #if(${kotlin})
