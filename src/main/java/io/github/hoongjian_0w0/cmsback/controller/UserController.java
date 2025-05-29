@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.hoongjian_0w0.cmsback.common.result.Result;
 import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.dto.LoginDTO;
 import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.List;
@@ -40,7 +43,7 @@ public class UserController {
     @PostMapping
     public Result save(@RequestBody User user) {
         try {
-                userService.save(user);
+            userService.save(user);
             return Result.ok().message("User Saved Successfully");
         } catch (Exception e) {
             throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Save User");

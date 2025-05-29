@@ -10,6 +10,4 @@ import org.springframework.stereotype.Service;
  * User table Service Implementation Class
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
-
-}
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {}

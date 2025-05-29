@@ -6,6 +6,4 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
  * User table Service Class
  */
-public interface IUserService extends IService<User> {
-
-}
+public interface IUserService extends IService<User> {}

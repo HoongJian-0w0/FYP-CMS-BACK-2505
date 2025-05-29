@@ -80,6 +80,26 @@ public class User implements Serializable {
     private String userType;
 
     /**
+     * Account not expired (1: yes, 0: expired)
+     */
+    private Boolean accountNonExpired;
+
+    /**
+     * Account not locked (1: yes, 0: locked)
+     */
+    private Boolean accountNonLocked;
+
+    /**
+     * Credentials not expired (1: yes, 0: expired)
+     */
+    private Boolean credentialsNonExpired;
+
+    /**
+     * Account enabled (1: yes, 0: disabled)
+     */
+    private Boolean enabled;
+
+    /**
      * Created by (user ID)
      */
     private Long createBy;
@@ -103,5 +123,6 @@ public class User implements Serializable {
      * Deletion flag (0: not deleted, 1: deleted)
      */
     private Integer deleted;
+
 
 }

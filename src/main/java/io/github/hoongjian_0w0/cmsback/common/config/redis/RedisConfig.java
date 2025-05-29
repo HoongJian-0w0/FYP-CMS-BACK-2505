@@ -1,3 +1,4 @@
+/*
 package io.github.hoongjian_0w0.cmsback.common.config.redis;
 
 import io.github.hoongjian_0w0.cmsback.common.utils.FastJsonRedisSerializer;
@@ -7,9 +8,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+*/
 /**
  * Redis Configuration
- */
+ *//*
+
 @Configuration
 public class RedisConfig {
 
@@ -31,3 +34,4 @@ public class RedisConfig {
         return template;
     }
 }
+*/

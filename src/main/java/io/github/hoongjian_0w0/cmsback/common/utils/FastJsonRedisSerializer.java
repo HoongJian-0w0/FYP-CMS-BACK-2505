@@ -1,3 +1,4 @@
+/*
 package io.github.hoongjian_0w0.cmsback.common.utils;
 
 import com.alibaba.fastjson.JSON;
@@ -8,9 +9,11 @@ import org.springframework.data.redis.serializer.SerializationException;
 
 import java.nio.charset.Charset;
 
+*/
 /**
  * Redis Serialization with FastJson
- */
+ *//*
+
 public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
 
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
@@ -42,4 +45,4 @@ public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
         String str = new String(bytes, DEFAULT_CHARSET);
         return JSON.parseObject(str, clazz);
     }
-}
+}*/
