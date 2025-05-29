@@ -37,8 +37,6 @@ public class AuthServiceImpl implements IAuthService {
         }
         // 4. Extract user info from authentication
         LoginUserDetails loginUserDetails = (LoginUserDetails) authenticate.getPrincipal();
-
-        System.out.println("LoginUserDetails: " + loginUserDetails);
         // 5. Convert loginUser to JSON string (e.g. using FastJSON)
         String loginUserString = JSON.toJSONString(loginUserDetails);
         // 6. Generate JWT using custom utility class

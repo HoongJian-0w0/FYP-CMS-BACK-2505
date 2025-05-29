@@ -1,18 +1,23 @@
 package io.github.hoongjian_0w0.cmsback.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * User table
  */
 @Getter
 @Setter
+@ToString
 @TableName("cms_user")
 public class User implements Serializable {
 
@@ -47,6 +52,7 @@ public class User implements Serializable {
     /**
      * Password
      */
+    @JSONField(serialize = false)
     private String password;
 
     /**
@@ -123,6 +129,5 @@ public class User implements Serializable {
      * Deletion flag (0: not deleted, 1: deleted)
      */
     private Integer deleted;
-
 
 }
