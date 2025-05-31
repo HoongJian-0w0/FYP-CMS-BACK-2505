@@ -1,13 +1,18 @@
 package io.github.hoongjian_0w0.cmsback.security.config;
 
 import io.github.hoongjian_0w0.cmsback.security.filter.JwtAuthenticationTokenFilter;
+import io.github.hoongjian_0w0.cmsback.security.handler.AnonymousAuthenticationHandler;
+import io.github.hoongjian_0w0.cmsback.security.handler.UserAccessDeniedHanlder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,6 +24,12 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+
+    @Autowired
+    private UserAccessDeniedHanlder userAccessDeniedHanlder;
+
+    @Autowired
+    private AnonymousAuthenticationHandler anonymousAuthenticationHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,13 +44,14 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    /**
-     *
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // Disable CSRF protection
         http.csrf(csrf -> csrf.disable());
+        //
+        http.sessionManagement(configerer -> {
+            configerer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        });
         // Configure request authorization rules
         http.authorizeHttpRequests(auth ->
                 auth.requestMatchers("/auth/login") // allow access to login path
@@ -50,6 +62,12 @@ public class SecurityConfig {
 
         // Add JWT filter before the default UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Add Exception Handler
+        http.exceptionHandling(configerer -> {
+            configerer.accessDeniedHandler(userAccessDeniedHanlder)
+            .authenticationEntryPoint(anonymousAuthenticationHandler);
+        });
 
         return http.build();
     }

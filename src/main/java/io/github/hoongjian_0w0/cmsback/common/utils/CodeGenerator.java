@@ -37,7 +37,7 @@ public class CodeGenerator {
                     builder.mapperBuilder().enableMapperAnnotation().build();
                     builder.controllerBuilder().enableHyphenStyle() // enable CamelCase
                             .enableRestStyle(); // Enable @RestController Interceptor
-                    builder.addInclude("cms_user") // <---- Configure Needed Table Name
+                    builder.addInclude("cms_menu") // <---- Configure Needed Table Name
                             .addTablePrefix("t_","cms_"); // <---- Configure Filter Table Prefix
                 })
                 // .templateEngine(new FreemarkerTemplateEngine()) // Default Engine Template: Velocity

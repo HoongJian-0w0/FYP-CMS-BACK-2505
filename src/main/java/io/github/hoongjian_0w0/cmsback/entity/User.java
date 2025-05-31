@@ -52,7 +52,7 @@ public class User implements Serializable {
     /**
      * Password
      */
-    @JSONField(serialize = false)
+    @JsonIgnore
     private String password;
 
     /**
