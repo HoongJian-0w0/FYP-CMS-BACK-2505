@@ -2,6 +2,7 @@ package io.github.hoongjian_0w0.cmsback.security.config;
 
 import io.github.hoongjian_0w0.cmsback.security.filter.JwtAuthenticationTokenFilter;
 import io.github.hoongjian_0w0.cmsback.security.handler.AnonymousAuthenticationHandler;
+// import io.github.hoongjian_0w0.cmsback.security.handler.LoginFailureHandler;
 import io.github.hoongjian_0w0.cmsback.security.handler.UserAccessDeniedHanlder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,9 @@ public class SecurityConfig {
 
     @Autowired
     private UserAccessDeniedHanlder userAccessDeniedHanlder;
+
+    // @Autowired
+    // private LoginFailureHandler loginFailureHandler;
 
     @Autowired
     private AnonymousAuthenticationHandler anonymousAuthenticationHandler;
@@ -48,9 +53,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // Disable CSRF protection
         http.csrf(csrf -> csrf.disable());
-        //
-        http.sessionManagement(configerer -> {
-            configerer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        /*http.formLogin(configurer -> {
+            configurer
+                .failureHandler(loginFailureHandler);
+        });
+*/
+        http.sessionManagement(configurer -> {
+            configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         });
         // Configure request authorization rules
         http.authorizeHttpRequests(auth ->
@@ -64,8 +74,8 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Add Exception Handler
-        http.exceptionHandling(configerer -> {
-            configerer.accessDeniedHandler(userAccessDeniedHanlder)
+        http.exceptionHandling(configurer -> {
+            configurer.accessDeniedHandler(userAccessDeniedHanlder)
             .authenticationEntryPoint(anonymousAuthenticationHandler);
         });
 

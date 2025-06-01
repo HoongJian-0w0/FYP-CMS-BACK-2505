@@ -4,12 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.github.hoongjian_0w0.cmsback.common.result.Result;
 import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.security.exception.UserAuthenticationException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -28,29 +27,16 @@ public class AnonymousAuthenticationHandler implements AuthenticationEntryPoint 
 
         response.setContentType("application/json;charset=UTF-8");
 
-        String resultJson;
+        String message = "Unauthorized access - authentication required.";
 
-        if (authException instanceof BadCredentialsException) {
-            // Incorrect username or password
-            resultJson = JSON.toJSONString(Result.error()
-                            .code(ResultCode.UNAUTHORIZED)
-                            .message("Incorrect username or password"),
-                    SerializerFeature.DisableCircularReferenceDetect);
-
-        } else if (authException instanceof InternalAuthenticationServiceException) {
-            // User not found or service-level error
-            resultJson = JSON.toJSONString(Result.error()
-                            .code(ResultCode.UNAUTHORIZED)
-                            .message("User authentication failed"),
-                    SerializerFeature.DisableCircularReferenceDetect);
-
-        } else {
-            // Other authentication errors
-            resultJson = JSON.toJSONString(Result.error()
-                            .code(ResultCode.UNAUTHORIZED)
-                            .message("Unauthorized access - authentication required."),
-                    SerializerFeature.DisableCircularReferenceDetect);
+        if (authException instanceof UserAuthenticationException) {
+            message = authException.getMessage(); // Custom token parsing error
         }
+
+        String resultJson = JSON.toJSONString(
+                Result.error().code(ResultCode.UNAUTHORIZED).message(message),
+                SerializerFeature.DisableCircularReferenceDetect
+        );
 
         ServletOutputStream outputStream = response.getOutputStream();
         outputStream.write(resultJson.getBytes(StandardCharsets.UTF_8));

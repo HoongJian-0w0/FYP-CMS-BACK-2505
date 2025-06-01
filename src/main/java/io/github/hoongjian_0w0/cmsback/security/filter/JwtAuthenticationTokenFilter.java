@@ -1,16 +1,21 @@
 package io.github.hoongjian_0w0.cmsback.security.filter;
 
 import com.alibaba.fastjson.JSON;
-import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
-import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 import io.github.hoongjian_0w0.cmsback.security.LoginUserDetails;
+import io.github.hoongjian_0w0.cmsback.security.exception.UserAuthenticationException;
+import io.github.hoongjian_0w0.cmsback.security.handler.AnonymousAuthenticationHandler;
 import io.github.hoongjian_0w0.cmsback.security.jwt.JwtUtil;
+import io.github.hoongjian_0w0.cmsback.security.util.TokenExtractor;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.lang.Objects;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -21,38 +26,48 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
+    @Autowired
+    private AnonymousAuthenticationHandler anonymousAuthenticationHandler;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // 1. Skip login endpoint — no JWT validation needed here
-        String uri = request.getRequestURI();
-        if (uri.contains("/auth/login")) {
+        try {
+            String uri = request.getRequestURI();
+            if (!uri.equals("/auth/login")) {
+                this.validateToken(request);
+            }
             filterChain.doFilter(request, response);
-            return;
+        } catch (AuthenticationException e) {
+            anonymousAuthenticationHandler.commence(request, response, e);
         }
-        // 2. Get Authorization header from request
-        String authHeader = request.getHeader("Authorization");
-        // 3. Validate Authorization header presence and prefix
-        if (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer ")) {
-            throw new ServiceException(ResultCode.UNAUTHORIZED, "Authentication failed, Token missing.");
+    }
+
+    private void validateToken(HttpServletRequest request) {
+        // 1. Get Authorization header from request
+        String token = TokenExtractor.extractToken(request);
+
+        String redisStr = stringRedisTemplate.opsForValue().get("token_" + token);
+        if(StringUtils.isEmpty(redisStr)){
+            throw new UserAuthenticationException("Invalid or expired JWT token");
         }
-        // 4. Extract the token string after "Bearer "
-        String token = authHeader.substring(7);
+
         LoginUserDetails loginUserDetails = null;
         try {
             Claims claims = JwtUtil.parseJWT(token);
             String loginUserDetailsString = claims.getSubject();
             loginUserDetails = JSON.parseObject(loginUserDetailsString, LoginUserDetails.class);
         } catch (Exception e) {
-            // 8. If any parsing error occurs, treat as unauthorized
-            throw new RuntimeException("Invalid or expired JWT token", e);
+            throw new UserAuthenticationException("Invalid or expired JWT token");
         }
-        // 9. Create authentication token and store it in the security context
+        // 4. Create authentication token and store it in the security context
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginUserDetails, null, loginUserDetails.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        filterChain.doFilter(request, response);
     }
 
 }

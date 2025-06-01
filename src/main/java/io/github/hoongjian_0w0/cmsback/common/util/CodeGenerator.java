@@ -1,9 +1,8 @@
-package io.github.hoongjian_0w0.cmsback.common.utils;
+package io.github.hoongjian_0w0.cmsback.common.util;
 
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class CodeGenerator {

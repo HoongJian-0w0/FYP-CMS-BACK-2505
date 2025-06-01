@@ -24,7 +24,7 @@ public class UserAccessDeniedHanlder implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream outputStream = response.getOutputStream();
 
-        String result = JSON.toJSONString(Result.error().message("Access Denied! Please contact administrator, if you believe this is an error.").code(ResultCode.UNAUTHORIZED), SerializerFeature.DisableCircularReferenceDetect);
+        String result = JSON.toJSONString(Result.error().message("Access Denied! Please contact administrator, if you believe this is an error.").code(ResultCode.METHOD_NOT_ALLOWED), SerializerFeature.DisableCircularReferenceDetect);
         outputStream.write(result.getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
         outputStream.close();
