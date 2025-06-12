@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.hoongjian_0w0.cmsback.mapper.MenuMapper">
 
-    <select id="getMenuByUserId" resultType="java.lang.String">
+    <!--<select id="getMenuByUserId" resultType="java.lang.String">
         SELECT t1.perms
         FROM cms_menu t1
                  INNER JOIN cms_role_menu t2 ON t1.id = t2.menu_id
@@ -12,5 +12,5 @@
         WHERE t5.id = #{userId}
           AND t1.perms IS NOT NULL
     </select>
-
+-->
 </mapper>

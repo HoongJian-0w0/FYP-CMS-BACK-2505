@@ -1,23 +1,20 @@
 package io.github.hoongjian_0w0.cmsback.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * User table
+ * User Table
  */
 @Getter
 @Setter
-@ToString
 @TableName("cms_user")
 public class User implements Serializable {
 
@@ -52,13 +49,8 @@ public class User implements Serializable {
     /**
      * Password
      */
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-
-    /**
-     * Account status (0: active, 1: disabled)
-     */
-    private String status;
 
     /**
      * Email
@@ -81,9 +73,10 @@ public class User implements Serializable {
     private String avatar;
 
     /**
-     * User type (0: admin, 1: regular)
+     * Roles
      */
-    private String userType;
+    @TableField(exist = false)
+    private List<Long> roleIds;
 
     /**
      * Account not expired (1: yes, 0: expired)
@@ -108,26 +101,30 @@ public class User implements Serializable {
     /**
      * Created by (user ID)
      */
+    @TableField(fill = FieldFill.INSERT)
     private Long createBy;
 
     /**
      * Creation time
      */
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
      * Updated by (user ID)
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
     /**
      * Update time
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     /**
-     * Deletion flag (0: not deleted, 1: deleted)
+     * Delete Flag (0 = exists, 1 = deleted)
      */
-    private Integer deleted;
+    private Boolean delFlag;
 
 }

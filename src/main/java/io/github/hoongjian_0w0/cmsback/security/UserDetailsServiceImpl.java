@@ -30,14 +30,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", username);
+        queryWrapper.eq("username", username) .eq("del_flag", 0);;
         User user = userMapper.selectOne(queryWrapper);
 
         if (user == null) {
             throw new UsernameNotFoundException("");
         }
 
-        List<String> permissionList = menuMapper.getMenuByUserId(user.getId());
+        List<String> permissionList = null;
 
         return new LoginUserDetails(user, permissionList);
     }

@@ -1,4 +1,4 @@
-package io.github.hoongjian_0w0.cmsback.common.config.mybatis;
+package io.github.hoongjian_0w0.cmsback.common.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

@@ -31,16 +31,26 @@ public class UserController {
     @Resource
     private IUserService userService;
 
-    @GetMapping("/list")
+    @GetMapping()
     @PreAuthorize("hasAuthority('cms:user-fetch')")
     public Result getAllUser() {
-        return Result.ok().data("list", userService.list()).message("Fetched All User");
+        List<User> users = userService.list();
+        if (users != null) {
+            return Result.ok().data("list", userService.list()).message("Fetched All User");
+        } else {
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Fetch Users");
+        }
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('cms:user-fetch-one')")
     public Result getById(@PathVariable Integer id) {
-        return Result.ok().data("item", userService.getById(id)).message("Fetched User by ID");
+        User user = userService.getById(id);
+        if (user != null) {
+            return Result.ok().data("item", userService.getById(id)).message("Fetched User by ID");
+        } else {
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Fetch User by ID");
+        }
     }
 
     @PostMapping
@@ -50,6 +60,7 @@ public class UserController {
             userService.save(user);
             return Result.ok().message("User Saved Successfully");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Save User");
         }
     }
@@ -57,10 +68,13 @@ public class UserController {
     @PutMapping
     @PreAuthorize("hasAuthority('cms:user-update')")
     public Result update(@RequestBody User user) {
-        if (userService.updateById(user)) {
+        try {
+            userService.updateById(user);
             return Result.ok().message("User Updated Successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(ResultCode.NOT_FOUND, "Update Failed: User Not Found");
         }
-        throw new ServiceException(ResultCode.NOT_FOUND, "Update Failed: User Not Found");
     }
 
     @DeleteMapping("/{id}")
@@ -84,11 +98,28 @@ public class UserController {
     @GetMapping("/page")
     @PreAuthorize("hasAuthority('cms:user-page')")
     public Result getPage(@RequestParam Integer pageNum,
-                          @RequestParam Integer pageSize) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("id");
-        Page<User> page = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
-        return Result.ok().data("page", page).message("Paged User List");
+                          @RequestParam Integer pageSize,
+                          @RequestParam(defaultValue = "") String username,
+                          @RequestParam(defaultValue = "") String email,
+                          @RequestParam(defaultValue = "") String phone) {
+        try {
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            if (!username.isBlank()) {
+                queryWrapper.like("username", username);
+            }
+            if (!email.isBlank()) {
+                queryWrapper.like("email", email);
+            }
+            if (!phone.isBlank()) {
+                queryWrapper.like("phone", phone);
+            }
+            queryWrapper.orderByDesc("id");
+            Page<User> page = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
+            return Result.ok().data("pagination", page).message("Paged User List");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

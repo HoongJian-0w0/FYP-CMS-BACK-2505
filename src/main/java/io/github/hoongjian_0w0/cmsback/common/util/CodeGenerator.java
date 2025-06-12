@@ -32,12 +32,20 @@ public class CodeGenerator {
                             ));
                 })
                 .strategyConfig(builder -> {
-                    builder.entityBuilder().enableLombok();
-                    builder.mapperBuilder().enableMapperAnnotation().build();
-                    builder.controllerBuilder().enableHyphenStyle() // enable CamelCase
-                            .enableRestStyle(); // Enable @RestController Interceptor
-                    builder.addInclude("cms_menu") // <---- Configure Needed Table Name
-                            .addTablePrefix("t_","cms_"); // <---- Configure Filter Table Prefix
+                    builder
+                            .addInclude("cms_role")
+                            .addTablePrefix("t_", "cms_");
+
+                    builder.entityBuilder()
+                            .enableLombok()
+                            .enableFileOverride();
+
+                    builder.mapperBuilder()
+                            .enableMapperAnnotation();
+
+                    builder.controllerBuilder()
+                            .enableHyphenStyle()
+                            .enableRestStyle();
                 })
                 // .templateEngine(new FreemarkerTemplateEngine()) // Default Engine Template: Velocity
                 .execute();

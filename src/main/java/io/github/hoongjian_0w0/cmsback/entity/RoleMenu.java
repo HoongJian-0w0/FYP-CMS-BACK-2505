@@ -4,72 +4,34 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Menu Table
+ * Role–Menu Mapping Table
  */
 @Getter
 @Setter
-@TableName("cms_menu")
-public class Menu implements Serializable {
+@TableName("cms_role_menu")
+public class RoleMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Primary Key
+     * Primary key
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * Parent Id
+     * Role ID
      */
-    private Long pid;
+    private Long roleId;
 
     /**
-     * Menu Name
+     * Menu ID
      */
-    private String title;
-
-    /**
-     * Permission String
-     */
-    private String code;
-
-    /**
-     * Route Name
-     */
-    private String name;
-
-    /**
-     * Route Path
-     */
-    private String path;
-
-    /**
-     * Component Path
-     */
-    private String component;
-
-    /**
-     * Menu Type
-     */
-    private String type;
-
-    /**
-     * Menu Icon
-     */
-    private String icon;
-
-    /**
-     * Menu display order
-     */
-    private Integer orderNum;
+    private Long menuId;
 
     /**
      * Created by (user ID)
@@ -99,19 +61,5 @@ public class Menu implements Serializable {
      * Delete Flag (0 = exists, 1 = deleted)
      */
     private Boolean delFlag;
-
-    /**
-     * Remarks
-     */
-    private String remark;
-
-    @TableField(exist = false)
-    private List<Menu> children = new ArrayList<>();
-
-    @TableField(exist = false)
-    private Long value;
-
-    @TableField(exist = false)
-    private String label;
 
 }

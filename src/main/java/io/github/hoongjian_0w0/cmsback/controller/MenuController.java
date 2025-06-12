@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static io.github.hoongjian_0w0.cmsback.common.util.MenuTree.genMenuTree;
+
 /**
  * Menu Table Controller
  */
@@ -29,7 +31,17 @@ public class MenuController {
 
     @GetMapping
     public Result getAllMenu() {
-        return Result.ok().data("list", menuService.list()).message("Fetched All Menu");
+        QueryWrapper<Menu> query = new QueryWrapper<>();
+        query.lambda().orderByAsc(Menu::getOrderNum);
+        List<Menu> menus = menuService.list();
+        List<Menu> menuList = genMenuTree(menus,0L);
+        return Result.ok().data("list", menuList).message("Fetched All Menu");
+    }
+
+    @GetMapping("/parents")
+    public Result getMenuParents() {
+        List<Menu> menus =  menuService.getParents();
+        return Result.ok().data("list", menus).message("Fetched Parent Menu");
     }
 
     @GetMapping("/{id}")
@@ -77,6 +89,6 @@ public class MenuController {
         QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
         Page<Menu> page = menuService.page(new Page<>(pageNum, pageSize), queryWrapper);
-        return Result.ok().data("page", page).message("Paged Menu List");
+        return Result.ok().data("pagination", page).message("Paged Menu List");
     }
 }

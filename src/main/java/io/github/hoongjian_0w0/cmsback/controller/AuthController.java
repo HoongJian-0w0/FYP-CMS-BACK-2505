@@ -8,11 +8,7 @@ import io.github.hoongjian_0w0.cmsback.service.IAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -23,8 +19,14 @@ public class AuthController {
     @Autowired
     private IAuthService authService;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    @GetMapping("/captcha")
+    public Result captcha() {
+        Map<String, Object> captcha = authService.genCaptcha();
+        if (captcha != null) {
+            return Result.ok().message("Captcha generated.").data(captcha);
+        }
+        throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to generate captcha.");
+    };
 
     @PostMapping("/login")
     public Result login(@RequestBody LoginDTO loginDTO) {

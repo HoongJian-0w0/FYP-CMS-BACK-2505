@@ -8,7 +8,10 @@ import java.util.Map;
 
 public interface IAuthService {
 
+    Map<String,Object> genCaptcha();
+
     Map<String,Object> login(LoginDTO loginDTO);
 
-    boolean logout(HttpServletRequest request, HttpServletResponse response);
+    Boolean logout(HttpServletRequest request, HttpServletResponse response);
+
 }
