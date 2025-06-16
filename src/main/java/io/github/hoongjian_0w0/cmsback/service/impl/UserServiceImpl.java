@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.hoongjian_0w0.cmsback.entity.User;
 import io.github.hoongjian_0w0.cmsback.entity.UserRole;
 import io.github.hoongjian_0w0.cmsback.mapper.UserMapper;
+import io.github.hoongjian_0w0.cmsback.security.LoginUserDetails;
 import io.github.hoongjian_0w0.cmsback.service.IUserRoleService;
 import io.github.hoongjian_0w0.cmsback.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,6 +121,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .collect(Collectors.toList());
 
         userRoleService.saveBatch(userRoles);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        LoginUserDetails loginUser = (LoginUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return loginUser.getUser();
     }
 
 }

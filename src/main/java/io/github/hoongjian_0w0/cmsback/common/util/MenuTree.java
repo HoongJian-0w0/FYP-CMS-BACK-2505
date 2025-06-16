@@ -19,7 +19,7 @@ public class MenuTree {
                     BeanUtils.copyProperties(item, menu);
                     menu.setLabel(item.getTitle());
                     menu.setValue(item.getId());
-                    List<Menu> children = genMenuTree(menuList, item.getId());
+                    List<Menu> children = genMenuTree(menus, item.getId());
                     menu.setChildren(children);
                     menuList.add(menu);
                 });

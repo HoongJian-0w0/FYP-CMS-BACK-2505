@@ -9,12 +9,14 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Menu Table
  */
 @Getter
 @Setter
+@ToString
 @TableName("cms_menu")
 public class Menu implements Serializable {
 
@@ -30,6 +32,12 @@ public class Menu implements Serializable {
      * Parent Id
      */
     private Long pid;
+
+    /**
+     * Parent Name
+     */
+    @TableField(exist = false)
+    private String pName;
 
     /**
      * Menu Name

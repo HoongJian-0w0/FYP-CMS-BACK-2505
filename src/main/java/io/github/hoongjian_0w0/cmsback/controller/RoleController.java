@@ -8,7 +8,6 @@ import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
-import java.util.List;
 
 import io.github.hoongjian_0w0.cmsback.service.IRoleService;
 import io.github.hoongjian_0w0.cmsback.entity.Role;
@@ -26,11 +25,6 @@ public class RoleController {
 
     @Resource
     private IRoleService roleService;
-
-    @GetMapping
-    public Result getAllRole() {
-        return Result.ok().data("list", roleService.list()).message("Fetched All Role");
-    }
 
     @GetMapping("/{id}")
     public Result getById(@PathVariable Integer id) {
@@ -62,14 +56,6 @@ public class RoleController {
             return Result.ok().message("Role Deleted Successfully");
         }
         return Result.error().message("Failed to Delete Role");
-    }
-
-    @DeleteMapping("/del/batch/{ids}")
-    public Result deleteBatch(@PathVariable List<Integer> ids) {
-        if (roleService.removeByIds(ids)) {
-            return Result.ok().message("Roles Deleted Successfully");
-        }
-        return Result.error().message("Failed to Batch Delete Roles");
     }
 
     @GetMapping("/page")

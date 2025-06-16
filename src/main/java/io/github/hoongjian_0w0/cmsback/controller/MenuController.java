@@ -75,20 +75,4 @@ public class MenuController {
         return Result.error().message("Failed to Delete Menu");
     }
 
-    @DeleteMapping("/del/batch/{ids}")
-    public Result deleteBatch(@PathVariable List<Integer> ids) {
-        if (menuService.removeByIds(ids)) {
-            return Result.ok().message("Menus Deleted Successfully");
-        }
-        return Result.error().message("Failed to Batch Delete Menus");
-    }
-
-    @GetMapping("/page")
-    public Result getPage(@RequestParam Integer pageNum,
-                          @RequestParam Integer pageSize) {
-        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("id");
-        Page<Menu> page = menuService.page(new Page<>(pageNum, pageSize), queryWrapper);
-        return Result.ok().data("pagination", page).message("Paged Menu List");
-    }
 }
