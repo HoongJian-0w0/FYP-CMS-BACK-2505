@@ -2,15 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.hoongjian_0w0.cmsback.mapper.MenuMapper">
 
-    <!--<select id="getMenuByUserId" resultType="java.lang.String">
-        SELECT t1.perms
-        FROM cms_menu t1
-                 INNER JOIN cms_role_menu t2 ON t1.id = t2.menu_id
-                 INNER JOIN cms_role t3 ON t3.id = t2.role_id
-                 INNER JOIN cms_user_role t4 ON t4.role_id = t3.id
-                 INNER JOIN cms_user t5 ON t5.id = t4.user_id
-        WHERE t5.id = #{userId}
-          AND t1.perms IS NOT NULL
+    <select id="getMenuByUserId" resultType="io.github.hoongjian_0w0.cmsback.entity.Menu">
+        SELECT DISTINCT m.* FROM cms_user_role AS ur
+        LEFT JOIN cms_role AS r ON ur.role_id = r.id
+        LEFT JOIN cms_role_menu AS rm ON r.id = rm.role_id
+        LEFT JOIN cms_menu AS m ON rm.menu_id = m.id
+        WHERE ur.user_id = #{userId}
+        ORDER BY m.order_num ASC;
     </select>
--->
+
+    <select id="getMenuByRoleId" resultType="io.github.hoongjian_0w0.cmsback.entity.Menu">
+        SELECT m.* FROM cms_role_menu AS rm, cms_menu AS m
+        WHERE rm.menu_id = m.id
+        AND rm.role_id = #{roleId}
+    </select>
+
 </mapper>

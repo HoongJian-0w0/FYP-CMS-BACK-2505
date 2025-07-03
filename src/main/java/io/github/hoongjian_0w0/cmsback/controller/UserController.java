@@ -4,8 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.hoongjian_0w0.cmsback.common.result.Result;
 import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.dto.AssignTreeDTO;
+import io.github.hoongjian_0w0.cmsback.dto.PasswordUpdateDTO;
+import io.github.hoongjian_0w0.cmsback.dto.ProfileUpdateDTO;
 import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 
+import io.github.hoongjian_0w0.cmsback.vo.AssignTreeVo;
+import io.github.hoongjian_0w0.cmsback.vo.UserInfoVo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -100,14 +105,29 @@ public class UserController {
 
     @GetMapping("/info")
     public Result getUserInfo() {
-        User user = userService.getCurrentUser();
+        UserInfoVo vo = userService.getCurrentUserInfo();
+        return Result.ok().data("user", vo).message("User info fetched successfully");
+    }
 
-        return Result.ok()
-                .data("id", user.getId())
-                .data("username", user.getUsername())
-                .data("firstName", user.getFirstName())
-                .data("lastName", user.getLastName())
-                .message("User info fetched successfully");
+    @PostMapping("/assignTree")
+    public Result getAssignTree(@RequestBody AssignTreeDTO assignTreeDTO) {
+        AssignTreeVo vo = userService.getAssignTree(assignTreeDTO);
+        return Result.ok().data("assignTree", vo).message("Assign Tree Fetched");
+    }
+
+    @PutMapping("/profile")
+    public Result updateProfile(@RequestBody ProfileUpdateDTO profileUpdateDTO) {
+        UserInfoVo updatedUser = userService.updateProfile(profileUpdateDTO);
+        return Result.ok().data("user",updatedUser).message("Profile Updated Successfully");
+    }
+
+    @PutMapping("/changePassword")
+    public Result updatePassword(@RequestBody PasswordUpdateDTO passwordDTO) {
+        if (userService.updatePassword(passwordDTO)) {
+            return Result.ok().message("Password Updated Successfully");
+        } else {
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Update Password");
+        }
     }
 
 }

@@ -34,6 +34,11 @@ public class Role implements Serializable {
     private String label;
 
     /**
+     * Role Code
+     */
+    private String code;
+
+    /**
      * Role Type
      */
     private String type;

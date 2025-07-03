@@ -5,8 +5,11 @@ import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
 import io.github.hoongjian_0w0.cmsback.entity.Menu;
 import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 import io.github.hoongjian_0w0.cmsback.mapper.MenuMapper;
+import io.github.hoongjian_0w0.cmsback.mapper.RoleMapper;
 import io.github.hoongjian_0w0.cmsback.service.IMenuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.hoongjian_0w0.cmsback.service.IUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -66,6 +69,16 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
             throw new ServiceException(ResultCode.BAD_REQUEST, "Cannot delete parent menu: it has child menus.");
         }
         return super.removeById(id);
+    }
+
+    @Override
+    public List<Menu> getMenuByUserId(Long userId) {
+        return baseMapper.getMenuByUserId(userId);
+    }
+
+    @Override
+    public List<Menu> getMenuByRoleId(Long roleId) {
+        return baseMapper.getMenuByRoleId(roleId);
     }
 
 }

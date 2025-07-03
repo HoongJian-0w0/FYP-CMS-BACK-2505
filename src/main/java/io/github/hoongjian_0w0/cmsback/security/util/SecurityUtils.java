@@ -14,11 +14,24 @@ public class SecurityUtils {
     }
 
     public static LoginUserDetails getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var context = SecurityContextHolder.getContext();
+        if (context == null) {
+            throw new IllegalStateException("SecurityContext is null");
+        }
+
+        var auth = context.getAuthentication();
+        if (auth == null) {
+            throw new IllegalStateException("Authentication is null");
+        }
+
+        var principal = auth.getPrincipal();
+        System.out.println("Principal type: " + (principal != null ? principal.getClass().getName() : "null"));
+
         if (principal instanceof LoginUserDetails loginUser) {
             return loginUser;
         }
-        throw new IllegalStateException("User not logged in or invalid principal type");
+
+        throw new IllegalStateException("Unexpected principal: " + principal);
     }
 
 }

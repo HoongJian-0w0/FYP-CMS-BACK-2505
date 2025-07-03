@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.hoongjian_0w0.cmsback.common.result.Result;
 import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.dto.RoleMenuDTO;
 import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 
+import io.github.hoongjian_0w0.cmsback.service.IRoleMenuService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
@@ -26,6 +29,14 @@ public class RoleController {
     @Resource
     private IRoleService roleService;
 
+    @Autowired
+    private IRoleMenuService roleMenuService;
+
+    @GetMapping
+    public Result getAllRole() {
+        return Result.ok().data("list", roleService.list()).message("Fetched All Role");
+    }
+
     @GetMapping("/{id}")
     public Result getById(@PathVariable Integer id) {
         return Result.ok().data("item", roleService.getById(id)).message("Fetched Role by ID");
@@ -37,7 +48,6 @@ public class RoleController {
             roleService.save(role);
             return Result.ok().message("Role Saved Successfully");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Save Role");
         }
     }
@@ -69,6 +79,18 @@ public class RoleController {
         queryWrapper.orderByDesc("id");
         Page<Role> page = roleService.page(new Page<>(pageNum, pageSize), queryWrapper);
         return Result.ok().data("pagination", page).message("Paged Role List");
+    }
+
+    @PostMapping("/saveRoleMenu")
+    public Result saveRoleMenu(@RequestBody RoleMenuDTO roleMenuDTO) {
+        System.out.println("DATA: " + roleMenuDTO);
+
+        boolean success = roleMenuService.saveRoleMenu(roleMenuDTO);
+        if (success) {
+            return Result.ok().message("RoleMenu Saved Successfully");
+        } else {
+            throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Save Role");
+        }
     }
 
 }

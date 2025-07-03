@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     @ResponseBody
     public Result handleValidation(Exception ex) {
+        ex.printStackTrace();
         return Result.error().code(ResultCode.BAD_REQUEST).message("Validation error: missing or invalid fields.");
     }
 
@@ -35,6 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public Result handleJsonParseError(HttpMessageNotReadableException ex) {
+        ex.printStackTrace();
         return Result.error().code(ResultCode.BAD_REQUEST).message("Invalid request format or missing fields.");
     }
 
@@ -44,6 +46,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseBody
     public Result handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        ex.printStackTrace();
         return Result.error().code(ResultCode.INTERNAL_SERVER_ERROR).message("Database constraint violated (e.g., missing NOT NULL field).");
     }
 
@@ -56,4 +59,5 @@ public class GlobalExceptionHandler {
         ex.printStackTrace();
         return Result.error().code(ResultCode.INTERNAL_SERVER_ERROR).message("Unexpected server error: " + ex.getMessage());
     }
+
 }

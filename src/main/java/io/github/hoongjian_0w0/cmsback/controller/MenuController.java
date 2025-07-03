@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.hoongjian_0w0.cmsback.common.result.Result;
 import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.dto.AssignTreeDTO;
 import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
 
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +56,7 @@ public class MenuController {
                 menuService.save(menu);
             return Result.ok().message("Menu Saved Successfully");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServiceException(ResultCode.INTERNAL_SERVER_ERROR, "Failed to Save Menu");
         }
     }

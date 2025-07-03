@@ -4,23 +4,34 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.hoongjian_0w0.cmsback.common.result.ResultCode;
+import io.github.hoongjian_0w0.cmsback.common.util.RoleCheckUtil;
+import io.github.hoongjian_0w0.cmsback.dto.AssignTreeDTO;
+import io.github.hoongjian_0w0.cmsback.dto.PasswordUpdateDTO;
+import io.github.hoongjian_0w0.cmsback.dto.ProfileUpdateDTO;
+import io.github.hoongjian_0w0.cmsback.entity.Menu;
 import io.github.hoongjian_0w0.cmsback.entity.User;
 import io.github.hoongjian_0w0.cmsback.entity.UserRole;
+import io.github.hoongjian_0w0.cmsback.exception.ServiceException;
+import io.github.hoongjian_0w0.cmsback.mapper.RoleMapper;
 import io.github.hoongjian_0w0.cmsback.mapper.UserMapper;
-import io.github.hoongjian_0w0.cmsback.security.LoginUserDetails;
+import io.github.hoongjian_0w0.cmsback.security.util.SecurityUtils;
+import io.github.hoongjian_0w0.cmsback.service.IMenuService;
 import io.github.hoongjian_0w0.cmsback.service.IUserRoleService;
 import io.github.hoongjian_0w0.cmsback.service.IUserService;
+import io.github.hoongjian_0w0.cmsback.vo.AssignTreeVo;
+import io.github.hoongjian_0w0.cmsback.vo.UserInfoVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.github.hoongjian_0w0.cmsback.common.util.MenuTree.genMenuTree;
 
 /**
  * User table Service Implementation Class
@@ -34,8 +45,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private IUserRoleService userRoleService;
 
+    @Autowired
+    private IMenuService menuService;
+
+    @Autowired
+    private RoleMapper roleMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public <E extends IPage<User>> E page(E page, Wrapper<User> queryWrapper) {
+        // TODO OPTIMISE THIS LOGIC
         E resultPage = super.page(page, queryWrapper);
         List<User> users = resultPage.getRecords();
         if (users == null || users.isEmpty()) {
@@ -124,12 +145,90 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public User getCurrentUser() {
-        LoginUserDetails loginUser = (LoginUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return loginUser.getUser();
+    public UserInfoVo getCurrentUserInfo() {
+        User user = SecurityUtils.getCurrentUser().getUser();
+        UserInfoVo vo = new UserInfoVo();
+        BeanUtils.copyProperties(user, vo);
+        return vo;
+    }
+
+    @Override
+    public AssignTreeVo getAssignTree(AssignTreeDTO assignTreeDTO) {
+        Long userId = assignTreeDTO.getUserId();
+        Long roleId = assignTreeDTO.getRoleId();
+
+        List<String> roleCodes = roleMapper.getRoleCodesByUserId(userId);
+        List<Menu> menuList = null;
+
+        if (RoleCheckUtil.isSuperAdmin(roleCodes)) {
+            menuList = menuService.list();
+        } else {
+            menuList = menuService.getMenuByUserId(userId);
+        }
+
+        List<Menu> menuTree = genMenuTree(menuList, 0L);
+
+        List<Menu> roleList = menuService.getMenuByRoleId(roleId);
+        List<Long> ids = new ArrayList<>();
+
+        Optional.ofNullable(roleList).orElse(new ArrayList<>())
+                .stream()
+                .filter(item -> item != null)
+                .forEach(item -> {
+                    ids.add(item.getId());
+                });
+
+        AssignTreeVo vo = new AssignTreeVo();
+        vo.setCheckList(ids.toArray());
+        vo.setMenuList(menuTree);
+
+        return vo;
+    }
+
+    @Override
+    public UserInfoVo updateProfile(ProfileUpdateDTO dto) {
+        Long currentUserId = SecurityUtils.getCurrentUser().getUser().getId();
+
+        User user = new User();
+        user.setId(currentUserId);
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setNickName(dto.getNickName());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        user.setGender(dto.getGender());
+        user.setAvatar(dto.getAvatar());
+
+        this.updateById(user);
+
+        User updatedUser = this.getById(currentUserId);
+        UserInfoVo vo = new UserInfoVo();
+        BeanUtils.copyProperties(updatedUser, vo);
+        return vo;
+    }
+
+    @Override
+    public boolean updatePassword(PasswordUpdateDTO passwordDTO) {
+        Long currentUserId = SecurityUtils.getCurrentUser().getUser().getId();
+
+        User user = userMapper.selectById(currentUserId);
+        if (user == null) {
+            throw new RuntimeException("User not found.");
+        }
+
+        if (!passwordEncoder.matches(passwordDTO.getOldPassword(), user.getPassword())) {
+            throw new ServiceException(ResultCode.BAD_REQUEST, "Old password is incorrect.");
+        }
+
+        if (!passwordDTO.getNewPassword().equals(passwordDTO.getConfirmPassword())) {
+            throw new ServiceException(ResultCode.BAD_REQUEST, "New password and confirmation do not match.");
+        }
+
+        String encodedNewPassword = passwordEncoder.encode(passwordDTO.getNewPassword());
+
+        int rows = userMapper.updatePassword(currentUserId, encodedNewPassword);
+
+        return rows > 0;
     }
 
 }

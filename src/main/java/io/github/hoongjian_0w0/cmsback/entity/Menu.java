@@ -104,6 +104,11 @@ public class Menu implements Serializable {
     private LocalDateTime updateTime;
 
     /**
+     * Hidden Flag (0 = exists, 1 = hided)
+     */
+    private Boolean hidden;
+
+    /**
      * Delete Flag (0 = exists, 1 = deleted)
      */
     private Boolean delFlag;
